@@ -1,0 +1,156 @@
+#include <cstdio>
+#include <iostream>
+#include <math.h>
+#include <vector>
+#include <fstream>
+#include <cstdlib>
+#include <string.h>
+
+using namespace std;
+class point{
+
+	private:
+	int x,y;
+
+	public:
+		point(int x1, int y1){
+			x=x1;
+			y=y1;
+		}
+
+		void print(){
+
+			cout<<"x = "<<x<<" y = "<<y<<endl;
+
+		}
+
+		int get_x(){
+
+			return x;
+		}
+
+		int get_y(){
+			return y;
+		}
+
+		double get_dist(point* p){
+
+			return sqrt(pow(p->get_y()-this->get_y(),2)+pow(p->get_x()-this->get_x(),2));
+
+		}
+//1- the same, 0- different
+		int compare(point *p){
+
+			if((this->get_x()==p->get_x())&&(this->get_y()==p->get_y()))
+				return 1;
+
+			return 0;
+		}
+
+};
+
+int check(vector<point*> point_vec,point*t){
+
+	for(int i=0;i<point_vec.size();i++)
+		if(point_vec[i]->compare(t))
+			return 0;
+
+	return 1;
+}
+
+vector<point*> read_vector( char* filename){
+	vector<point*> point_vec;
+	char c[256];
+	char *c1;
+	ifstream file(filename);
+	int x,y;
+	point *t;
+	
+	while (!file.eof()){
+		file>>x>>y;
+		t=new point(x,y);
+		if(check(point_vec,t))
+			point_vec.push_back(t);
+	}
+	
+	return point_vec;
+};
+
+
+vector<point*> get_cluster(vector<point*> point_vec, double rad){
+	
+	double matr[point_vec.size()][point_vec.size()];
+	vector<point*> cluster;
+	int centr_num;
+	int vol=0;
+	int vol_t;
+	for(int i=0;i<point_vec.size();i++)
+		for(int j=0; j<point_vec.size();j++)
+			matr[i][j]=point_vec[i]->get_dist(point_vec[j]);
+			
+
+	for(int i=0;i<point_vec.size();i++){
+		vol_t=0;
+		for(int j=0; j<point_vec.size();j++)
+			if(matr[i][j]<=rad)				
+				vol_t+=1;
+		
+
+		if(vol_t>vol){
+			vol=vol_t;
+			centr_num=i;
+		}
+	}	
+		
+	for(int i=0;i<point_vec.size();i++){
+		if(matr[centr_num][i]<=rad)
+			cluster.push_back(point_vec[i]);
+
+	}
+	
+	return cluster;
+}
+
+
+point* get_mass_center(vector<point*> cluster){
+	double x_c=0;
+	double y_c=0;
+
+	for(int i=0; i<cluster.size();i++){
+		x_c+=cluster[i]->get_x();
+		y_c+=cluster[i]->get_y();
+	}
+
+	return new point((int)(x_c/cluster.size()),(int)(y_c/cluster.size()));
+
+
+}
+
+int main(int argc, char *argv[]){
+
+	double rad;
+
+	vector<point*> point_vec;
+	vector<point*> cluster;
+	point_vec= read_vector(argv[1]);
+
+
+	/*for(int i=0;i<point_vec.size();i++)
+		point_vec[i]->print();*/
+
+	rad=atoi(argv[2]);
+
+	
+	cluster=get_cluster(point_vec,rad);
+	cout<<"СЃРїРёСЃРѕРє С‚РѕС‡РµРє:"<<endl;
+	for(int i=0;i<cluster.size();i++)
+		cluster[i]->print();
+
+	cout<<"Р¦РµРЅС‚СЂ РјР°СЃСЃ: ";
+	get_mass_center(cluster)->print();
+
+	return 0;
+
+
+
+}
