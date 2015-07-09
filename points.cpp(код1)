@@ -125,6 +125,107 @@ point* get_mass_center(vector<point*> cluster){
 
 
 }
+//границы изображения
+vector<point*> get_bounds(vector<point*> cluster){
+	int mx,my,max,may;
+	vector<point*> answ;
+
+
+	mx=cluster[0]->get_x();
+	my=cluster[0]->get_y();
+	may=cluster[0]->get_y();
+	max=cluster[0]->get_x();
+	for(int i=0;i<cluster.size();i++){
+		if(mx>cluster[i]->get_x())
+			mx=cluster[i]->get_x();
+
+		if(my>cluster[i]->get_y())
+			my=cluster[i]->get_y();
+
+		if(max<cluster[i]->get_x())
+			max=cluster[i]->get_x();
+
+		if(may<cluster[i]->get_y())
+			may=cluster[i]->get_y();		
+
+	}
+	answ.push_back(new point(mx,my));
+	answ.push_back(new point(max,may));
+	return answ;
+
+
+}
+
+void draw_points(vector<point*> full_size, vector<point*> main_points, vector<point*> bounds, char* filename){
+
+	ofstream file(filename);
+	int x; int y;
+	x=full_size[1]->get_x();
+	y=full_size[1]->get_y();
+	int ymin,ymax,xmax,xmin;
+
+	ymin=bounds[0]->get_y();
+	xmin=bounds[0]->get_x();
+
+	ymax=bounds[1]->get_y();
+	xmax=bounds[1]->get_x();
+
+	int matr[x][y];
+	//cout<<ymin<<" "<<xmin<<" "<<ymax<<" "<<xmax<<endl;
+	file<<"P3"<<endl<<y<<" "<<x<<endl<<255<<endl;
+
+	for(int i=0;i<x;i++)
+		for (int j=0;j<y;j++){
+			matr[i][j]=0;
+
+			if((i+1>=xmin)&&(i+1<=xmax)&&((j+1==ymin)||(j+1==ymax)))
+							matr[i][j]=1;
+			
+			if ((j+1>=ymin)&&(j+1<=ymax)&&((i+1==xmin)||(i+1==xmax)))
+				matr[i][j]=1;
+		}
+	
+
+	for(int i=0;i<main_points.size();i++)
+		matr[main_points[i]->get_x()-1][main_points[i]->get_y()-1]=2;
+
+
+	point* t;
+
+	t=get_mass_center(main_points);
+
+	matr[t->get_x()-1][t->get_y()-1]=3;
+
+	
+	for(int i=0;i<x;i++)
+		for (int j=0;j<y;j++){
+			switch(matr[x-1-i][j]){
+
+				case 0: 
+					file<<"255 255 255"<<endl;
+					break;
+				case 1: 
+					file<<"100 100 100"<<endl;
+					break;
+				case 2: 
+					file<<"0 0 0"<<endl;
+					break;
+				case 3:
+					file<<"200 0 0"<<endl;
+					break;
+				default:break;
+
+			}
+
+
+		}
+		
+	
+	file.close();
+
+
+
+}
 
 int main(int argc, char *argv[]){
 
@@ -132,6 +233,7 @@ int main(int argc, char *argv[]){
 
 	vector<point*> point_vec;
 	vector<point*> cluster;
+	vector<point*> bounds;
 	point_vec= read_vector(argv[1]);
 
 
@@ -142,12 +244,23 @@ int main(int argc, char *argv[]){
 
 	
 	cluster=get_cluster(point_vec,rad);
-	cout<<"СЃРїРёСЃРѕРє С‚РѕС‡РµРє:"<<endl;
+	cout<<"список точек:"<<endl;
 	for(int i=0;i<cluster.size();i++)
 		cluster[i]->print();
 
-	cout<<"Р¦РµРЅС‚СЂ РјР°СЃСЃ: ";
+
+	cout<<endl<<"Центр масс: ";
 	get_mass_center(cluster)->print();
+
+	bounds= get_bounds(cluster);
+
+	cout<<endl<<"Границы прямоугольной области:"<<endl;
+	for(int i=0;i<bounds.size();i++)
+		bounds[i]->print();
+
+	cout<<"Длина границ: "<<bounds[1]->get_x()-bounds[0]->get_x()<<"x"<<bounds[1]->get_y()-bounds[0]->get_y()<<endl;
+
+	draw_points(get_bounds(point_vec),cluster,bounds,argv[3]);
 
 	return 0;
 
