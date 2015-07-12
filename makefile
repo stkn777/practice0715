@@ -1,2 +1,2 @@
 all:
-  g++ points.cpp -o point
+	g++ points.cpp -o point
