@@ -5,49 +5,9 @@
 #include <fstream>
 #include <cstdlib>
 #include <string.h>
-
+#include "cpoint.h"
 using namespace std;
-class point{
 
-	private:
-	int x,y;
-
-	public:
-		point(int x1, int y1){
-			x=x1;
-			y=y1;
-		}
-
-		void print(){
-
-			cout<<"x = "<<x<<" y = "<<y<<endl;
-
-		}
-
-		int get_x(){
-
-			return x;
-		}
-
-		int get_y(){
-			return y;
-		}
-
-		double get_dist(point* p){
-
-			return sqrt(pow(p->get_y()-this->get_y(),2)+pow(p->get_x()-this->get_x(),2));
-
-		}
-//1- the same, 0- different
-		int compare(point *p){
-
-			if((this->get_x()==p->get_x())&&(this->get_y()==p->get_y()))
-				return 1;
-
-			return 0;
-		}
-
-};
 
 int check(vector<point*> point_vec,point*t){
 
@@ -123,7 +83,7 @@ point* get_mass_center(vector<point*> cluster){
 
 
 }
-//границы изображения
+//РіСЂР°РЅРёС†С‹ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 vector<point*> get_bounds(vector<point*> cluster){
 	int mx,my,max,may;
 	vector<point*> answ;
@@ -382,7 +342,7 @@ int main(int argc, char *argv[]){
 
 	yellow=get_cluster(point_vec,5);
 
-	cout<<"Желтый объект: "<<endl;
+	cout<<"Р–РµР»С‚С‹Р№ РѕР±СЉРµРєС‚: "<<endl;
 
 	for(int i=0;i<point_vec.size();i++)
 		point_vec[i]->print();
